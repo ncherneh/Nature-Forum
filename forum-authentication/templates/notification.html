@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/static/notification.css" rel="stylesheet" type="text/css">
+    <title>Notifications</title>
+</head>
+
+<body>
+    <header class="header_wrapper">
+        <div class="header_body">
+            <a href="/" class="logo"></a>
+            <div class="header_buttons">
+                {{if .User}}
+                <div class="notification">
+                    <img src="/static/photos/bell.png" alt="bell">
+                </div>
+                <button class="username"><a id="username" href="/user/{{.User.Username}}">Hello
+                        {{.User.Username}}</a></button>
+                <form id="logout-form" action="/logout" method="post" style="display:inline;">
+                    <button type="submit">Log Out</button>
+                </form>
+                {{else}}
+                <button><a href="/register" style="display:inline;">Register</a></button>
+                <button><a href="/login" style="display:inline;">Log In</a></button>
+                {{end}}
+            </div>
+        </div>
+    </header>
+    <h1>Your notifications</h1>
+    <div class="all_notif">
+        {{range .Activity}}
+        <div class="notif_card">
+            {{if .UserLikedIt.Username}}
+            <h3>{{.UserLikedIt.Username}}</h3>
+            <p>Liked your post</p>
+            {{end}}
+    
+            {{if .UserDislikedIt.Username}}
+            <h3>{{.UserDislikedIt.Username}}</h3>
+            <p>Disliked your post</p>
+            {{end}}
+    
+            {{if .UserCommentedIt.Username}}
+            <h3>{{.UserCommentedIt.Username}}</h3>
+            <p>Commented your post</p>
+            {{end}}
+    
+            <div class="post_title">
+                <a href="/post/{{.Post.ID}}">
+                    <p>{{.Post.Title}}</p>
+                </a>
+            </div>
+        </div>
+        {{end}}
+    </div>
+</body>
+
+</html>

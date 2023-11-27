@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/static/login.css" rel="stylesheet" type="text/css">
+    <title>Log In</title>
+</head>
+<body>
+    <h1>Log In</h1>
+    <div class="main-wrapper">
+        <form method="POST" action="/login">
+            <p class="warning">
+                {{.}}
+            </p>
+            <div class="email">
+                <h3><label for="email">Email:</label></h3>
+                <input type="email" id="email" name="email" placeholder="example@example.com" required><br>
+            </div>
+            <div class="password">
+                <h3><label for="password">Password:</label></h3>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required><br>
+            </div>
+            <div class="button">
+                <input type="submit" value="Login">
+            </div>
+        </form>
+    </div>
+    <p>Don't have an account? <a href="/register">Register</a></p>
+    <div class="cont">
+        <p>Continue with: </p>
+    </div>
+    <div class="google-git">
+        <button class="google">
+            <a href="/google/login/" style="display:inline;"><img src="/static/photos/google.png" alt="google" class="icon_dislike"></a>
+        </button>
+        <button class="git" >
+            <a href="/github/login/"><img src="/static/photos/github.png" alt="github" class="icon_dislike"></a>
+        </button>
+    </div>
+</body>
+</html>

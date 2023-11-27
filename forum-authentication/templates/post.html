@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/static/post.css" rel="stylesheet" type="text/css">
+    <title>{{.Post.Title}}</title>
+</head>
+
+<body>
+    <header class="header_wrapper">
+        <div class="header_body">
+            <a href="/" class="logo"></a>
+            <div class="header_buttons">
+                {{if .UserID}}
+                <div class="notification">
+                    <a href="/notifications">
+                        {{if .NewNotification}}
+                        <img src="/static/photos/notification.png" alt="have notification">
+                        {{else}}
+                        <img src="/static/photos/bell.png" alt="bell">
+                        {{end}}
+                    </a>
+                
+                </div>
+                <button class="username"><a id="username" href="/user/{{.UserID.Username}}">Hello
+                        {{.UserID.Username}}</a></button>
+                <form id="logout-form" action="/logout" method="post" style="display:inline;">
+                    <button type="submit">Log Out</button>
+                </form>
+                {{else}}
+                <button><a href="/register" style="display:inline;">Register</a></button>
+                <button><a href="/login" style="display:inline;">Log In</a></button>
+                {{end}}
+            </div>
+        </div>
+    </header>
+    <div class="main-wrapper">
+        <div class="left-side">
+            <div class="post-header">
+                <h3>{{.Post.Username}}</h3>
+            </div>
+            {{if eq .AuthUserID .Post.UserID}}
+            {{if .CanChange}}
+            {{else}}
+            <form action="/post/{{.Post.ID}}" method="get">
+                <input type="hidden" name="CanChange" value="true">
+                <button type="submit" class="edit">Edit post</button>
+            </form>
+            {{end}}
+            <form action="/edit-post", method="post">
+                {{if .CanChange}}
+                <button type="submit" class="save-post">Save</button>
+                {{end}}
+                <input type="hidden" name="post_id" value="{{.Post.ID}}">
+                <textarea type="text" {{if .CanChange}} readwrite="readwrite" {{else}} readonly="readonly" {{end}} name="title-edit-post" id="title-edit-post" placeholder="Write a title" required
+                minlength="5" maxlength="100" class="post-title" >{{.Post.Title}}</textarea><br>
+                
+                <textarea type="text" {{if .CanChange}} readwrite="readwrite" {{else}} readonly="readonly" {{end}} class="content" name="text-edit-content"
+                id="text-edit-content" placeholder="Write a content" required minlength="10" maxlength="10000"
+                >{{.Post.Content}}</textarea>
+
+            </form>
+            {{else}}
+            <h1 class="post-title">{{.Post.Title}}</h1>
+            <p>{{.Post.Content}}</p>
+            {{end}}
+            <div class="category">
+                {{range .Categories}}
+                <span>{{.Name}}</span>
+                {{end}}
+            </div>
+
+            <div class="like-dislike">
+                <form action="/like-post" method="get" style="display:inline;"
+                    onsubmit="event.preventDefault(); handleLikePost(this);">
+                    <input type="hidden" name="post_id" value="{{.Post.ID}}">
+                    {{if .Post.IsLikedByAuthUser}}
+                    <button class="btn_like">
+                        <img src="/static/photos/liked.png" alt="like" class="icon_like">
+                    </button>
+                    {{else}}
+                    <button class="btn_not_like">
+                        <img src="/static/photos/not-liked.png" alt="like" class="icon_like">
+                    </button>
+                    {{end}}
+                </form>
+                <span class="likes">{{.Post.Likes}}</span>
+                <form action="/dislike-post" method="get" style="display:inline;"
+                    onsubmit="event.preventDefault(); handleDislikePost(this);">
+                    <input type="hidden" name="post_id" value="{{.Post.ID}}">
+                    {{if .Post.IsDislikedByAuthUser}}
+                    <button class="btn_dislike">
+                        <img src="/static/photos/disliked.png" alt="dislike" class="icon_dislike">
+                    </button>
+                    {{else}}
+                    <button class="btn_dislike">
+                        <img src="/static/photos/not-dislike.png" alt="dislike" class="icon_dislike">
+                    </button>
+                    {{end}}
+                </form>
+                <span class="dislikes">{{.Post.Dislikes}}</span>
+            </div>
+            <div class="delete">
+                {{if eq .AuthUserID .Post.UserID}}
+                <form action="/delete-post" method="post" style="display:inline;">
+                    <input type="hidden" name="post-id" value="{{.Post.ID}}">
+                    <button type="submit" class="delete1">Delete</button>
+                </form>
+                {{end}}
+
+            </div>
+            
+            <div class="time">
+                <p class="text-time">Published at: {{.CreatedAt.Format "2006-01-02 15:04:05"}}</p>
+            </div>
+        </div>
+        <div class="right-side">
+            <div class="create-comment">
+                {{if .AuthUserID}}
+                <div>
+                    <form action="/comment" method="post">
+                        <input type="hidden" name="post_id" value="{{.Post.ID}}">
+                        <textarea name="comment_content" placeholder=" Add a comment" required minlength="2"
+                            maxlength="100"></textarea><br>
+                        <button class="post-btn" type="submit">Post it!</button>
+                    </form>
+                </div>
+                {{end}}
+            </div>
+            <div class="all-comments">
+                {{range .Comments}}
+                <div class="comment-card">
+                    <div class="comment-header">
+                        <h3>{{.Username}}</h3>
+                    </div>
+                    {{if eq $.AuthUserID .UserID}}
+                        {{if $.CanChangeComment}}
+                        {{else}}
+                            <form action="/post/{{$.Post.ID}}" method="get">
+                                <input type="hidden" name="CanChangeComment" value="true">
+                                <button type="submit" class="edit">Edit comment</button>
+                            </form>
+                        {{end}}
+                        <form action="/edit-comment" , method="post">
+                            {{if $.CanChangeComment}}
+                            <button type="submit" class="save-post">Save</button>
+                            {{end}}
+                            <input type="hidden" name="comment_id" value="{{.ID}}">
+                            <input type="hidden" name="post_id" value="{{.PostID}}">
+                        
+                            <textarea type="text" {{if $.CanChangeComment}} readwrite="readwrite" {{else}} readonly="readonly" {{end}} class="comment_content" name="comment-edit-content" id="comment-edit-content" placeholder="Write a comment"
+                                required minlength="10" maxlength="100" >{{.Content}}</textarea>
+                        </form>
+                    {{else}}
+                    <p class="com_text">{{.Content}}</p>
+                    {{end}}
+                    <div class="like-dislike">
+                        <form action="/like-comment" method="get" style="display:inline;"
+                            onsubmit="event.preventDefault(); handleLikeComment(this);">
+                            <input type="hidden" name="comment_id" value="{{.ID}}">
+                            {{if .IsLikedByAuthUser}}
+                            <button class="btn_like">
+                                <img src="/static/photos/liked.png" alt="like" class="icon_like">
+                            </button>
+                            {{else}}
+                            <button class="btn_not_like">
+                                <img src="/static/photos/not-liked.png" alt="like" class="icon_like">
+                            </button>
+                            {{end}}
+                        </form>
+                        <span class="likes">{{.Likes}}</span>
+                        <form action="/dislike-comment" method="get" style="display:inline;"
+                            onsubmit="event.preventDefault(); handleDislikeComment(this);">
+                            <input type="hidden" name="comment_id" value="{{.ID}}">
+                            {{if .IsDislikedByAuthUser}}
+                            <button class="btn_dislike">
+                                <img src="/static/photos/disliked.png" alt="dislike" class="icon_dislike">
+                            </button>
+                            {{else}}
+                            <button class="btn_dislike">
+                                <img src="/static/photos/not-dislike.png" alt="dislike" class="icon_dislike">
+                            </button>
+                            {{end}}
+                        </form>
+                        <span class="dislikes">{{.Dislikes}}</span>
+                    </div>
+                    <div class="delete">
+                        {{if eq $.AuthUserID .UserID}}
+                        <form action="/delete-comment" method="post" style="display:inline;">
+                            <input type="hidden" name="comment_id" value="{{.ID}}">
+                            <button type="submit">Delete</button>
+                        </form>
+                        {{end}}
+
+                       
+                        
+                    </div><br>
+                    <div class="time">
+                        <p class="text-time">Published at: {{.CreatedAt.Format "2006-01-02 15:04:05"}}</p>
+                    </div>
+                </div>
+                {{end}}
+            </div><br>
+        </div>
+    </div>
+    <script>
+        function handleLikePost(form) {
+            const url = new URL(form.action);
+            const postID = form.querySelector('input[name="post_id"]').value;
+            url.searchParams.append('post_id', postID);
+            fetch(url)
+                .then(response => response.text())
+                .then(() => {
+                    location.reload();
+                });
+        }
+        function handleDislikePost(form) {
+            const url = new URL(form.action);
+            const postID = form.querySelector('input[name="post_id"]').value;
+            url.searchParams.append('post_id', postID);
+            fetch(url)
+                .then(response => response.text())
+                .then(() => {
+                    location.reload();
+                });
+        }
+        function handleLikeComment(form) {
+            const url = new URL(form.action);
+            const postID = form.querySelector('input[name="comment_id"]').value;
+            url.searchParams.append('comment_id', postID);
+            fetch(url)
+                .then(response => response.text())
+                .then(() => {
+                    location.reload();
+                });
+        }
+        function handleDislikeComment(form) {
+            const url = new URL(form.action);
+            const postID = form.querySelector('input[name="comment_id"]').value;
+            url.searchParams.append('comment_id', postID);
+            fetch(url)
+                .then(response => response.text())
+                .then(() => {
+                    location.reload();
+                });
+        }
+    </script>
+</body>
+
+</html>
