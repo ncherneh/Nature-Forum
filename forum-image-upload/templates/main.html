@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="/static/main.css" rel="stylesheet" type="text/css">
+  <title>Forum</title>
+</head>
+<body>
+  <header class="header_wrapper">
+    <div class="header_body">
+          <a href="/" class="logo"></a>
+          <div class="header_buttons">
+            {{if .UserID}}
+            <button class="username"><a id="username" href="/user/{{.UserID.Username}}">Hello {{.UserID.Username}}</a></button>
+            <form id="logout-form" action="/logout" method="post" style="display:inline;">
+              <button type="submit">Log Out</button>
+            </form>
+            {{else}}
+            <button><a href="/register" style="display:inline;">Register</a></button>
+            <button><a href="/login" style="display:inline;">Log In</a></button>
+            {{end}}
+          </div>
+        </div>
+  </header>
+  <h1>Welcome to Our Forum about Nature: Join the Discussion on Conservation</h1>
+  {{if .UserID}}
+    <div class="write_post">
+      <a id="bt_writepost" href="/create-post" class="bt_writepost">Create a post</a>
+      <!-- <button class="bt_writepost"></button> -->
+    </div>
+  {{end}}
+  <div class="filter">
+    <div class="header_filters">
+      <h3 class="cat_title">Sort By</h3>
+  <form action="/" method="get">
+    <div class="filters">
+      <input type="radio" name="sort" value="likes" id="sort-likes">
+      <label for="sort-likes">Likes</label>
+    </div>
+    <div class="filters">
+      <input type="radio" name="sort" value="dislikes" id="sort-dislikes">
+      <label for="sort-dislikes">Dislikes</label>
+    </div><br><br>
+      <h3 class="cat_title">Category</h3>
+      <form action="/" method="get">
+        {{range .Categories}}
+        <div class="filters">
+          <input type="checkbox" name="categories" value="{{.ID}}" id="category-{{.ID}}">
+          <label for="category-{{.ID}}">{{.Name}}</label>
+        </div>
+        {{end}}<br>
+        <button type="submit">Apply filters</button>
+      </form>
+    </div>
+    <div class="header_search">
+      <form action="/" method="get">
+        <input type="textarea" class="textarea" name="search" placeholder="Write a title of a post" class="search-form">
+        <button type="submit" class="search-button">Search</button>
+      </form>
+    </div>
+  </div>  
+  <div class="content">
+    <div>
+      <div class="card-wrapper">
+        {{range .Posts}}
+        <div class="post-card" onclick="window.location.href='/post/{{.Post.ID}}'">
+          <div class="card-header">
+            <h3>{{.Author.Username}}</h3>
+            <!-- <div class="see-category">
+              <h3 class="hover_title">Show category</h3>
+              <div class="hover-content">
+                {{range .Categories}}
+                <p>{{.Name}}</p>
+                {{end}}
+              </div>
+            </div> -->
+          </div>
+          <h2 class="post-title">{{.Post.Title}}</h2><br>
+          <div class="preview">
+            <p class class="previw_cont">{{.PreviewContent}}</p>
+          </div><br>
+          <div class="category">
+            <!-- <h3>Category</h3> -->
+            <p class="prev-cat">{{.PreviewCategories}}</p>
+          </div>
+          <div class="like-dislike">
+            <form action="/like-post" method="get" class="like" style="display:inline;" onsubmit="event.preventDefault(); handleLikePost(this);">
+              <input type="hidden" name="post_id" value="{{.Post.ID}}">
+              {{if .Post.IsLikedByAuthUser}}
+              <button class="btn_like">
+                <img src="/static/photos/liked.png" alt="like" class="icon_like" >
+              </button >
+              {{else}}
+              <button class="btn_not_like">
+                <img src="/static/photos/not-liked.png" alt="like" class="icon_like">
+              </button>
+              {{end}}
+            </form>
+            <span class="likes">{{.Post.Likes}}</span>
+            <form action="/dislike-post" method="get" style="display:inline;" onsubmit="event.preventDefault(); handleDislikePost(this);">
+              <input type="hidden" name="post_id" value="{{.Post.ID}}">
+              {{if .Post.IsDislikedByAuthUser}}
+              <button class="btn_dislike">
+                <img src="/static/photos/disliked.png" alt="dislike" class="icon_dislike">
+              </button>
+              {{else}}
+              <button class="btn_dislike">
+                <img src="/static/photos/not-dislike.png" alt="dislike" class="icon_dislike">
+              </button>
+              {{end}}
+            </form>
+            <span class="dislikes">{{.Post.Dislikes}}</span>            
+          </div>
+        </div>
+        {{end}}
+      </div>
+    </div>
+  </div>
+  <script>
+    function handleLikePost(form) {
+      const url = new URL(form.action);
+      const postID = form.querySelector('input[name="post_id"]').value;
+      url.searchParams.append('post_id', postID);
+      fetch(url)
+        .then(response => response.text())
+        .then(() => {
+          location.reload();
+        });
+    }
+    function handleDislikePost(form) {
+      const url = new URL(form.action);
+      const postID = form.querySelector('input[name="post_id"]').value;
+      url.searchParams.append('post_id', postID);
+  
+      fetch(url)
+        .then(response => response.text())
+        .then(() => {
+          location.reload();
+        });
+    }
+  </script>  
+  <footer>
+    <h3>Authors</h3>
+    <a href="https://01.kood.tech/git/ncherneh" target="_blank">Nikol Cherneha,</a>
+    <a href="https://01.kood.tech/git/sbondar" target="_blank">Svitlana Bondar,</a>
+    <a href="https://01.kood.tech/git/vnahynal" target="_blank">Valeriia Nahynaliuk,</a>
+    <a href="https://01.kood.tech/git/aandriie" target="_blank">Anastasiia Andriievska</a>
+    <a href="https://01.kood.tech/git/ivelychk" target="_blank">Iryna Velychko</a>
+  </footer>
+</body>
+</html>
