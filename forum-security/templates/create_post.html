@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/static/create_post.css" rel="stylesheet" type="text/css">
+    <title>Forum</title>
+</head>
+<body>
+    <header class="header_wrapper">
+        <div class="header_body">
+            <a href="/" class="logo"></a>
+            <div class="header_buttons">
+                {{if .UserID}}
+                <button class="username"><a id="username" href="/user/{{.UserID.Username}}">Hello
+                        {{.UserID.Username}}</a></button>
+                <form id="logout-form" action="/logout" method="post" style="display:inline;">
+                    <button type="submit">Log Out</button>
+                </form>
+                {{else}}
+                <button><a href="/register" style="display:inline;">Register</a></button>
+                <button><a href="/login" style="display:inline;">Log In</a></button>
+                {{end}}
+            </div>
+        </div>
+    </header>
+    <h1>Create a new post</h1>
+    <div class="main-wrapper">
+        <form id="create-post-form" action="/create-post" method="post">
+            <div class="title">
+                <h3><label for="title-create-post">Title</label></h3>
+                <input type="text" name="title-create-post" id="title-create-post" placeholder="Write a title"
+                    required minlength="5" maxlength="100"><br>
+            </div><br>
+            <div class="cat">
+                <p class="warning">
+                    {{.Message}}
+                </p>
+                <h3 class="cat_title">Category</h3>
+                {{range .Categories}}
+                <div class="filters">
+                    <input type="checkbox" name="category-create-post[]" value="{{.ID}}" id="category-{{.ID}}">
+                    <label for="category-{{.ID}}">{{.Name}}</label><br>
+                </div>
+                {{end}}
+            </div> <br>
+            <div class="cont">
+                <h3><label for="text-create-post">Content</label></h3>
+                <textarea name="text-create-post" id="text-create-post" placeholder="Write a content" required minlength="10"
+                    maxlength="1500"></textarea><br>
+            </div>
+            <p>{{.Message}}</p>
+            <div class="button">
+                <button type="submit" class="bt_postit" value="Post it!">Post it!</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

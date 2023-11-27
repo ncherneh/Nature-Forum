@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="/static/user.css" rel="stylesheet" type="text/css">
+  <title>Forum</title>
+</head>
+
+<body>
+  <header class="header_wrapper">
+    <div class="header_body">
+      <a href="/" class="logo"></a>
+      <div class="header_buttons">
+        {{if .User.ID}}
+        <button class="username"><a id="username" href="/user/{{.User.Username}}">Hello
+            {{.User.Username}}</a></button>
+        <form id="logout-form" action="/logout" method="post" style="display:inline;">
+          <button type="submit">Log Out</button>
+        </form>
+        {{else}}
+        <button><a href="/register" style="display:inline;">Register</a></button>
+        <button><a href="/login" style="display:inline;">Log In</a></button>
+        {{end}}
+      </div>
+    </div>
+  </header>
+  <div class="main-detail">
+    <h1>User information</h1>
+    <div class="name">
+      <h3>User name: </h3>
+      <h3 class="uname">{{.AuthUser.Username}}</h3>
+    </div>
+    <div class="mail">
+      <h3>Email: </h3>
+      <h3 class="usermail">{{.AuthUser.Email}}</h3>
+    </div>
+  </div>
+  <div class="main-wrapper">
+    <div class="top-side">
+      <h2>Your posts</h2>
+      <div class="card-wrapper">
+        {{range .Posts}}
+        <div class="post-card">
+          <a href="/post/{{.ID}}">
+            <h3>{{.Title}}</h3>
+          </a>
+        </div>
+        {{end}}
+      </div>
+    </div>
+    <div class="bottom-side">
+      <h2 class="useractv">Your comments</h2>
+      <div class="com-wrapper">
+        {{range $index, $comment := .Comments}}
+        <div class="com-card">
+          <a href="/post/{{$comment.PostID}}">
+            <p>{{index $.PreviewComments $index}}</p>
+          </a>
+        </div>
+        {{end}}
+      </div>
+    </div>
+    <div class="top-side">
+      <h2>Your liked posts</h2>
+      <div class="card-wrapper">
+        {{range .Likes_Posts}}
+        <div class="post-card">
+          <a href="/post/{{.ID}}">
+            <h3>{{.Title}}</h3>
+          </a>
+        </div>
+        {{end}}
+      </div>
+    </div>
+    <div class="bottom-side">
+      <h2>Your liked comments</h2>
+      <div class="com-wrapper">
+        {{range $index, $likedComment := .Likes_Comments}}
+        <div class="com-card">
+          <a href="/post/{{$likedComment.PostID}}">
+            <p>{{index $.PreviewLikesComments $index}}</p>
+          </a>
+        </div>
+        {{end}}
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
